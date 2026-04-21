@@ -1,0 +1,9 @@
+export declare const read: (filePath: string) => string;
+export declare const write: (filePath: string, content: string) => void;
+export declare const repoRoot: (dir?: string) => string | undefined;
+export declare const isInRepo: () => boolean;
+export declare const tsGitPath: (...parts: string[]) => string;
+export declare const workingCopyPath: (...parts: string[]) => string;
+export declare const lsRecursive: (dirPath: string) => string[];
+export declare const nestFlatTree: (flatTree: Record<string, string>) => Record<string, any>;
+export declare const flattenNestedTree: (tree: Record<string, any>, prefix?: string) => Record<string, string>;

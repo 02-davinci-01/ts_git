@@ -1,0 +1,19 @@
+{
+  "name": "ts_git",
+  "version": "0.1.0",
+  "description": "A Git implementation in TypeScript, based on Gitlet",
+  "main": "./dist/gitlet.js",
+  "types": "./dist/gitlet.d.ts",
+  "bin": {
+    "ts_git": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.4"
+  }
+}
