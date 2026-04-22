@@ -2,15 +2,17 @@
 import * as fs from "node:fs";
 import { tsGitPath, read, write, lsRecursive, workingCopyPath } from "./files.js";
 import { hash } from "./util.js";
-import { skip } from "node:test";
 import * as path from "node:path";
 
 export const readIndex=()=>{
     if (!fs.existsSync(tsGitPath("index"))) return {};
     const content = read(tsGitPath("index"));
     const result: Record<string, string> = {};
-for (const line of content.split("\n")) {
+for (const line of content.split("\n").filter(Boolean)) {
     const [filePath, fileHash] = line.split(" ");
+    if (!filePath || !fileHash) {
+        continue;
+    }
     result[filePath] = fileHash;
 }
 return result;
@@ -39,7 +41,7 @@ export const workingCopytoc=()=>{
     files.forEach((file)=>{
         if(file.includes(".tsgit")){
            return
-        } 
+        }
         let relativePath = path.relative(workingCopyPath(), file).split("\\").join("/");
          result[relativePath] = hash(read(file))
     })
