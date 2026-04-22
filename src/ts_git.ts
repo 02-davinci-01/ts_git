@@ -6,6 +6,8 @@ import { readIndex, toc, workingCopytoc, writeIndex } from "./index";
 import * as path  from "node:path";
 import { hash as resolveRef, terminalRef, writeRef } from "./refs.js";
 
+//making the relevant directories
+//objects -- refs/heads and the HEAD
 export const init = (): void =>{
     const currentDir:string = process.cwd();
 
@@ -15,9 +17,9 @@ export const init = (): void =>{
 
     const root = repoRoot(currentDir);
     fs.mkdirSync(".tsgit/objects", { recursive: true });
-fs.mkdirSync(".tsgit/refs/heads", { recursive: true });
-write(".tsgit/HEAD", "ref: refs/heads/main");
-writeConfig({ core: { bare: "false" } });
+    fs.mkdirSync(".tsgit/refs/heads", { recursive: true });
+    write(".tsgit/HEAD", "ref: refs/heads/main");
+    writeConfig({ core: { bare: "false" } }); 
 }
 
 export const add = (filePath:string)=>{
@@ -26,12 +28,12 @@ export const add = (filePath:string)=>{
     }
 
     const content = fs.readFileSync(filePath,"utf-8");
-    const blobHash = writeObject(content);
+    const blobHash = writeObject(content); //hash created the 2 file structure made
 
-    const index = readIndex();
+    const index = readIndex(); //index is filepath -> filehash mapping
     const relativePath = path.relative(workingCopyPath(), filePath).split("\\").join("/");
-    index[relativePath]=blobHash;
-    writeIndex(index);
+    index[relativePath]=blobHash; //updating
+    writeIndex(index); //putting it in the index file for changes
 
 }
 
@@ -45,11 +47,12 @@ export const commit = (message:string)=>{
     throw Error("nothing to commit");
 }
 
-    let treeHash = writeTree(nestFlatTree(index));
-    let parentHash = resolveRef("HEAD");
-    let commitHash = writeCommit(treeHash,message,parentHash);
-    const ref = terminalRef("HEAD");
-    writeRef(ref, commitHash);
+    let treeHash = writeTree(nestFlatTree(index)); //resolve in the index into a nested object -- treeHash
+    let parentHash = resolveRef("HEAD"); //find the hash of the ref pointer -- the latest commit hash
+    let commitHash = writeCommit(treeHash,message,parentHash); //creation of the commit obj
+    const ref = terminalRef("HEAD"); //finding the terminal ref -- end ref
+    writeRef(ref, commitHash);//adding commit hash at the top -- there is only commit that is remaining so where does the other commit object go?
+     
 }
 
 export const log = ()=>{

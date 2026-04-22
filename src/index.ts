@@ -22,10 +22,12 @@ write(tsGitPath("index"), output);
 
 }
 
+//table of content: a flat map of key value ie filePath to fileHash.
 export const toc = ()=>{
     return readIndex();
 }
 
+//simple hasFileChecks.
 export const hasFile=function (filePath:string):Boolean{
     const mapIndex:Record<string,string> = readIndex();
     return Object.hasOwn(mapIndex,filePath);
