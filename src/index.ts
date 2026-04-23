@@ -4,7 +4,7 @@ import { tsGitPath, read, write, lsRecursive, workingCopyPath } from "./files.js
 import { hash } from "./util.js";
 import * as path from "node:path";
 
-export const readIndex=()=>{
+export const readIndex=():Record<string,string>=>{
     if (!fs.existsSync(tsGitPath("index"))) return {};
     const content = read(tsGitPath("index"));
     const result: Record<string, string> = {};
@@ -35,7 +35,7 @@ export const hasFile=function (filePath:string):Boolean{
     return Object.hasOwn(mapIndex,filePath);
 }
 
-export const workingCopytoc=()=>{
+export const workingCopytoc=():Record<string,string>=>{
     const files = lsRecursive(workingCopyPath());
     let result:Record<string,string> = {};
     files.forEach((file)=>{

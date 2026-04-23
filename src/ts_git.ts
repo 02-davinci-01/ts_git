@@ -1,5 +1,5 @@
 import * as fs from "fs"
-import { isInRepo, nestFlatTree, repoRoot, tsGitPath, workingCopyPath, write } from "./files";
+import { isInRepo, nestFlatTree, read, repoRoot, tsGitPath, workingCopyPath, write } from "./files";
 import { writeConfig } from "./config";
 import { commitToc, readObject, writeCommit, writeObject, writeTree } from "./objects";
 import { readIndex, toc, workingCopytoc, writeIndex } from "./index";
@@ -32,20 +32,41 @@ export const add = (filePath:string)=>{
         throw Error("add expects a file path");
     }
 
+
+    
+    const index = readIndex(); //index is filepath -> filehash mapping
+    if(filePath==="."){
+        const blobsWorking:Record<string,string>=workingCopytoc();
+        //creating objecs for everything
+        Object.entries(blobsWorking).forEach(([filePath,blobHash])=>{
+            const objFilePath = tsGitPath('objects', blobHash.slice(0,2), blobHash.slice(2))
+            write(objFilePath,read(filePath));
+        })
+        
+        for(const [workPath, workBlob] of Object.entries(blobsWorking)){
+ 
+                index[workPath] = workBlob;
+        }
+        writeIndex(index);
+        console.log("All files staged");
+        return;
+            
+        
+    }
+    
     const absolutePath = path.resolve(process.cwd(), filePath);
     if (!fs.existsSync(absolutePath) || !fs.statSync(absolutePath).isFile()) {
         throw Error(`pathspec '${filePath}' did not match any files`);
     }
-
+    
     const relativePath = path.relative(workingCopyPath(), absolutePath).split("\\").join("/");
     if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
         throw Error(`path '${filePath}' is outside the repository`);
     }
-
+    
     const content = fs.readFileSync(absolutePath,"utf-8");
     const blobHash = writeObject(content); //hash created the 2 file structure made
-
-    const index = readIndex(); //index is filepath -> filehash mapping
+    
     index[relativePath]=blobHash; //updating
     writeIndex(index); //putting it in the index file for changes
     console.log("added: " + relativePath);
