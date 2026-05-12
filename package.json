@@ -1,19 +1,44 @@
 {
-  "name": "ts_git",
+  "name": "tsgit",
   "version": "0.1.0",
-  "description": "A Git implementation in TypeScript, based on Gitlet",
-  "main": "./dist/gitlet.js",
-  "types": "./dist/gitlet.d.ts",
+  "description": "A Git implementation in TypeScript — supports init, add, commit, log, status, branching, checkout, and three-way merge",
+  "main": "./dist/ts_git.js",
+  "types": "./dist/ts_git.d.ts",
   "bin": {
-    "ts_git": "./dist/cli.js"
+    "ts-git": "./dist/cli.js"
   },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
-    "test": "vitest"
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "git",
+    "typescript",
+    "version-control",
+    "vcs",
+    "cli"
+  ],
+  "author": "Vedant Nagwanshi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vedant-nagwanshi/ts-git"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.4"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1"
   }
 }

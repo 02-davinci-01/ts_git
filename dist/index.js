@@ -44,8 +44,11 @@ const readIndex = () => {
         return {};
     const content = (0, files_js_1.read)((0, files_js_1.tsGitPath)("index"));
     const result = {};
-    for (const line of content.split("\n")) {
+    for (const line of content.split("\n").filter(Boolean)) {
         const [filePath, fileHash] = line.split(" ");
+        if (!filePath || !fileHash) {
+            continue;
+        }
         result[filePath] = fileHash;
     }
     return result;
@@ -56,10 +59,12 @@ const writeIndex = (index) => {
     (0, files_js_1.write)((0, files_js_1.tsGitPath)("index"), output);
 };
 exports.writeIndex = writeIndex;
+//table of content: a flat map of key value ie filePath to fileHash.
 const toc = () => {
     return (0, exports.readIndex)();
 };
 exports.toc = toc;
+//simple hasFileChecks.
 const hasFile = function (filePath) {
     const mapIndex = (0, exports.readIndex)();
     return Object.hasOwn(mapIndex, filePath);

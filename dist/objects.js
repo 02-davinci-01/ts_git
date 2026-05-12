@@ -39,21 +39,25 @@ const files_js_1 = require("./files.js");
 const util_js_1 = require("./util.js");
 const fs = __importStar(require("node:fs"));
 const writeObject = (content) => {
+    /* hash content, store it, return hash */
     const hashCon = (0, util_js_1.hash)(content);
     const objDir = hashCon.slice(0, 2);
     const fileName = hashCon.slice(2);
-    const objFilePath = (0, files_js_1.tsGitPath)('objects', objDir, fileName);
+    const objFilePath = (0, files_js_1.tsGitPath)("objects", objDir, fileName);
     (0, files_js_1.write)(objFilePath, content);
     return hashCon;
 };
 exports.writeObject = writeObject;
+//standard readObj function.
 const readObject = (objectHash) => {
+    /* read object by hash */
     const objFilePath = (0, files_js_1.tsGitPath)("objects", objectHash.slice(0, 2), objectHash.slice(2));
     const content = (0, files_js_1.read)(objFilePath);
     return content;
 };
 exports.readObject = readObject;
 const exists = (objectHash) => {
+    /* does this object exist? */
     return fs.existsSync((0, files_js_1.tsGitPath)("objects", objectHash.slice(0, 2), objectHash.slice(2)));
 };
 exports.exists = exists;
@@ -64,7 +68,7 @@ exports.type = type;
 const writeTree = (tree) => {
     let treeLines = [];
     Object.entries(tree).forEach(([it, value]) => {
-        if (typeof (value) === 'string') {
+        if (typeof value === "string") {
             treeLines.push(`blob ${it} ${value}`);
         }
         else {
@@ -75,28 +79,30 @@ const writeTree = (tree) => {
     return (0, exports.writeObject)(treeLines.join("\n"));
 };
 exports.writeTree = writeTree;
-const writeCommit = (treeHash, message, parentHash) => {
+const writeCommit = (treeHash, message, ...parentHashes) => {
     const parts = ["commit", "tree " + treeHash];
-    if (parentHash)
+    for (const parentHash of parentHashes) {
         parts.push("parent " + parentHash);
+    }
     parts.push(""); // ← always: blank line separator
     parts.push(message);
-    // if parentHash exists, push "parent " + parentHash
-    // push empty string (blank line separator)
-    // push message
     return (0, exports.writeObject)(parts.join("\n"));
 };
 exports.writeCommit = writeCommit;
 const fileTree = (hash) => {
     let content = (0, exports.readObject)(hash);
-    if ((0, exports.type)(hash) === 'commit') {
-        const treeHash = content.split("\n")
-            .find(line => line.startsWith("tree ")) // find the line
+    if ((0, exports.type)(hash) === "commit") {
+        const treeHash = content
+            .split("\n")
+            .find((line) => line.startsWith("tree ")) // find the line
             ?.split(" ")[1];
         return (0, exports.fileTree)(treeHash); // extract the hash
     }
     let result = {};
-    content.split('\n').filter(Boolean).forEach((line) => {
+    content
+        .split("\n")
+        .filter(Boolean)
+        .forEach((line) => {
         const [entryType, name, entryHash] = line.split(" ");
         if (entryType === "blob") {
             result[name] = entryHash;

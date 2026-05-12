@@ -1,39 +1,48 @@
-import { diff } from 'node:util';
-import { status } from './ts_git';
+import { Diff, DiffEntry, FileStatus } from "./types.js";
 
-//there are basically 4 categories
-//A: giver -- can be remembered by append
-//D: receiving
-//M: modified
-//Same -- that which stays same. 
+export const tocDiff = (
+  receiver: Record<string, string>,
+  giver: Record<string, string>,
+): Diff => {
+  const diffRecord: Diff = {};
 
-type FileStatus = "A" | "D" | "M" | "SAME";
+  // Collect all unique file paths from both sides
+  const allFiles = new Set([...Object.keys(receiver), ...Object.keys(giver)]);
 
-interface DiffEntry{
-    status: FileStatus;
-    receiver: string | undefined;
-    giver: string | undefined;
-}
+  for (const file of allFiles) {
+    const inReceiver = Object.hasOwn(receiver, file);
+    const inGiver = Object.hasOwn(giver, file);
 
-type Diff = Record<string, DiffEntry>;
+    if (inReceiver && !inGiver) {
+      // Exists in receiver but not in giver → Deleted
+      diffRecord[file] = {
+        status: "D",
+        receiver: receiver[file],
+        giver: undefined,
+      };
+    } else if (!inReceiver && inGiver) {
+      // Exists in giver but not in receiver → Added
+      diffRecord[file] = {
+        status: "A",
+        receiver: undefined,
+        giver: giver[file],
+      };
+    } else if (receiver[file] !== giver[file]) {
+      // Exists in both but hashes differ → Modified
+      diffRecord[file] = {
+        status: "M",
+        receiver: receiver[file],
+        giver: giver[file],
+      };
+    } else {
+      // Exists in both with same hash → Same (unchanged)
+      diffRecord[file] = {
+        status: "SAME",
+        receiver: receiver[file],
+        giver: giver[file],
+      };
+    }
+  }
 
-export const tocDiff= (receiver: Record<string,string>,giver:Record<string,string>)=>{
-    const diffRecord:Diff ={};
-    
-    //now the idea is to classify. 
-    // and the type should be of diffEntry ie it should be an object with these 3 things.
-    //classifying only in giver
-    Object.entries(giver).forEach(([item,value])=>{
-       if( Object.hasOwn(receiver,item) ){
-            diffRecord[item]={
-                "status": "M",
-                "receiver":giver[item],
-                "giver": value
-                
-            }
-       } 
-    })
-}
-
-
-
+  return diffRecord;
+};

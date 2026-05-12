@@ -38,6 +38,7 @@ exports.flattenNestedTree = exports.nestFlatTree = exports.lsRecursive = exports
 const fs = __importStar(require("node:fs"));
 const path = __importStar(require("node:path"));
 const util_js_1 = require("./util.js");
+//blocking read operation
 const read = (filePath) => { /* ... */ return fs.readFileSync(filePath, "utf-8"); };
 exports.read = read;
 const write = (filePath, content) => {
@@ -45,6 +46,7 @@ const write = (filePath, content) => {
     fs.writeFileSync(filePath, content);
 };
 exports.write = write;
+//a simple dfs idea
 const repoRoot = (dir) => {
     let current = process.cwd();
     while (current !== path.dirname(current)) {
@@ -56,8 +58,10 @@ const repoRoot = (dir) => {
     return undefined;
 };
 exports.repoRoot = repoRoot;
+//If not in repo then it stays undefined
 const isInRepo = () => { /* ... */ return (0, exports.repoRoot)() !== undefined; };
 exports.isInRepo = isInRepo;
+//easy access to the .tsgit repo
 const tsGitPath = (...parts) => {
     const root = (0, exports.repoRoot)();
     if (root === undefined)
@@ -72,6 +76,7 @@ const workingCopyPath = (...parts) => {
     return path.join((0, exports.repoRoot)(), ...parts);
 };
 exports.workingCopyPath = workingCopyPath;
+//a flat lit of all file paths
 const lsRecursive = (dirPath) => {
     let results = [];
     fs.readdirSync(dirPath, { withFileTypes: true }).forEach((it) => {
@@ -86,6 +91,7 @@ const lsRecursive = (dirPath) => {
     return results;
 };
 exports.lsRecursive = lsRecursive;
+//nesting the flat-tree using our previous setIn function
 const nestFlatTree = (flatTree) => {
     let result = {};
     Object.entries(flatTree).forEach(([filePath, value]) => {
@@ -94,6 +100,7 @@ const nestFlatTree = (flatTree) => {
     return result;
 };
 exports.nestFlatTree = nestFlatTree;
+//the polar opposite of the nestFlatTree. 
 const flattenNestedTree = (tree, prefix) => {
     //flatten a nested tree would be to recursively extract values from each node
     let result = {};
@@ -104,7 +111,6 @@ const flattenNestedTree = (tree, prefix) => {
         }
         if (typeof (value) === 'object') {
             Object.assign(result, (0, exports.flattenNestedTree)(value, fullKey));
-            return;
         }
     });
     return result;

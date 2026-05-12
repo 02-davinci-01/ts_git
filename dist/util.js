@@ -2,8 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.intersection = exports.unique = exports.flatten = exports.lines = exports.setIn = exports.hash = void 0;
 const node_crypto_1 = require("node:crypto");
+//sha-1 hash
 const hash = (content) => { return (0, node_crypto_1.createHash)("sha1").update(content).digest("hex"); };
 exports.hash = hash;
+//probably the most important function: setIn -- 
+//it makes nested objects from path arrays: 
 const setIn = (obj, path) => {
     if (path.length === 2) {
         obj[path[0]] = path[1];
@@ -13,8 +16,10 @@ const setIn = (obj, path) => {
     return obj;
 };
 exports.setIn = setIn;
+//the line function --- we split lines  at every new line
 const lines = (str) => { return str.split(/\r?\n/).filter(Boolean); };
 exports.lines = lines;
+//flatten an object -- also writing a recursive version of it
 const flatten = (arr) => {
     return arr.flat(Infinity);
 };
