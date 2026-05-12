@@ -28,17 +28,23 @@ const parseFlag = (
 };
 
 const usage = [
+  "02_git — A Git implementation in TypeScript",
+  "",
   "Usage:",
-  "  ts-git init",
-  "  ts-git add <path>",
-  '  ts-git commit -m "message"',
-  "  ts-git log",
-  "  ts-git status",
-  "  ts-git branch <name>",
-  "  ts-git checkout <name>",
-  '  ts-git merge <branch> -m "message"',
-  "  ts-git c-merge <branch>",
-  "  ts-git curr-branch",
+  "  ts-git <command> [options]",
+  "",
+  "Commands:",
+  "  init                        Initialize a new repository",
+  "  add <path>                  Stage a file (use . to stage all)",
+  '  commit -m "message"         Commit staged changes',
+  "  log                         Show commit history",
+  "  status                      Show working tree status",
+  "  branch <name>               Create a new branch",
+  "  checkout <name>             Switch to a branch",
+  "  curr-branch                 Show the current branch",
+  '  merge <branch> -m "msg"     Merge a branch into current',
+  "  c-merge <branch>            Check for merge conflicts without merging",
+  "  help                        Show this help message",
 ].join("\n");
 
 try {
@@ -107,8 +113,16 @@ try {
     case "curr-branch":
       currentBranch();
       break;
+    case "help":
+    case "--help":
+    case "-h":
+    case undefined:
+      console.log(usage);
+      break;
     default:
-      throw Error("unknown command: " + (command ?? "") + "\n\n" + usage);
+      console.error("unknown command: " + command + "\n");
+      console.log(usage);
+      process.exitCode = 1;
   }
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
