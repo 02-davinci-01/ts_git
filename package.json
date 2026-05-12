@@ -1,5 +1,5 @@
 {
-  "name": "tsgit",
+  "name": "ts_git",
   "version": "0.1.0",
   "description": "A Git implementation in TypeScript — supports init, add, commit, log, status, branching, checkout, and three-way merge",
   "main": "./dist/ts_git.js",
